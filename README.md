@@ -20,14 +20,12 @@ Then install the qa dependencies:
 
     pip install -r qa/requirements.txt
 
-Also install and run our test server:
-
-    cd backend
-    npm install
-    npm start
-
 
 ## Usage
+
+Run the test server and selnium/zap services:
+
+    docker-compose up
 
 Run end-to-end tests using:
 
