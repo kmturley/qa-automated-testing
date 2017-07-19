@@ -12,34 +12,34 @@ Example project showing qa automated testing tools:
 
 First activate a virtual environment:
 
-  pip install virtualenv
-  virtualenv env
-  source env/bin/activate
+    pip install virtualenv
+    virtualenv env
+    source env/bin/activate
 
 Then install the qa dependencies:
 
-  pip install -r qa/requirements.txt
+    pip install -r qa/requirements.txt
 
 Also install and run our test server:
 
-  cd backend
-  npm install
-  npm start
+    cd backend
+    npm install
+    npm start
 
 
 ## Usage
 
 Run end-to-end tests using:
 
-  behave qa/e2e/features
+    behave qa/e2e/features
 
 Run performance tests using:
 
-  locust -f qa/performance/locustfile.py --host=https://localhost:3000
+    locust -f qa/performance/locustfile.py --host=https://localhost:3000
 
 Run penetration/security tests using:
 
-  behave qa/security/features
+    behave qa/security/features
 
 
 ## Directory structure
