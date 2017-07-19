@@ -16,7 +16,7 @@ import time
 
 
 # Locator Map
-HEADER_PATH = (By.XPATH, '//body/div/h1')
+HEADER_PATH = (By.XPATH, '//body/h1')
 
 
 @then('the header should be exactly "{words}"')

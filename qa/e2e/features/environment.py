@@ -29,6 +29,7 @@ from qa.e2e.features.browser import Browser
 #
 
 def before_scenario(context, scenario):
+
     if 'browser' in context.tags:
         context.browser = Browser()
         context.driver = context.browser.get_browser_driver()
