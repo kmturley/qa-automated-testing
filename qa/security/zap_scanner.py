@@ -3,63 +3,51 @@ import time
 import json
 from pprint import pprint
 from zapv2 import ZAPv2
-from qa.accounts import Accounts
-from qa.environment_variables import BASE_URL, QA_FOLDER_PATH
 
-BASE_URL = os.getenv('BASE_URL', BASE_URL)
-ZAP_SERVER_PROXY = os.getenv(
-    'ZAP_SERVER_PROXY',
-    Accounts.ZAP_API_IP + ':' + Accounts.ZAP_API_PORT
-)
-API_KEY = Accounts.ZAP_API_KEY
+class Scanner:
+    def run(self, target, apikey):
+        # By default ZAP API client will connect to port 8080
+        zap = ZAPv2(apikey=apikey)
 
-zap = ZAPv2(
-    apikey=API_KEY,
-    proxies={
-        'http': "http://%s" % ZAP_SERVER_PROXY,
-        'https': "https://%s" % ZAP_SERVER_PROXY
-    }
-)
+        # Proxy a request to the target so that ZAP has something to deal with
+        print('Accessing target {}'.format(target))
+        zap.urlopen(target)
+        # Give the sites tree a chance to get updated
+        time.sleep(2)
 
-# Proxy a request to the target so that ZAP has something to deal with
-print('Accessing target {}'.format(BASE_URL))
-zap.urlopen(BASE_URL)
-# Give the sites tree a chance to get updated
-time.sleep(2)
+        print('Spidering target {}'.format(target))
+        scanid = zap.spider.scan(target)
+        # Give the Spider a chance to start
+        time.sleep(2)
+        while (int(zap.spider.status(scanid)) < 100):
+            # Loop until the spider has finished
+            print('Spider progress %: {}'.format(zap.spider.status(scanid)))
+            time.sleep(2)
 
-print('Spidering target {}'.format(BASE_URL))
-scanid = zap.spider.scan(BASE_URL)
-# Give the Spider a chance to start
-time.sleep(2)
-while (int(zap.spider.status(scanid)) < 100):
-    # Loop until the spider has finished
-    print('Spider progress %: {}'.format(zap.spider.status(scanid)))
-    time.sleep(2)
+        print ('Spider completed')
 
-print ('Spider completed')
+        while (int(zap.pscan.records_to_scan) > 0):
+            print ('Records to passive scan : {}'.format(zap.pscan.records_to_scan))
+            time.sleep(2)
 
-while (int(zap.pscan.records_to_scan) > 0):
-    print ('Records to passive scan : {}'.format(zap.pscan.records_to_scan))
-    time.sleep(2)
+        print ('Passive Scan completed')
 
-print ('Passive Scan completed')
+        print ('Active Scanning target {}'.format(target))
+        scanid = zap.ascan.scan(target)
+        while (int(zap.ascan.status(scanid)) < 100):
+            # Loop until the scanner has finished
+            print ('Scan progress %: {}'.format(zap.ascan.status(scanid)))
+            time.sleep(5)
 
-print ('Active Scanning target {}'.format(BASE_URL))
-scanid = zap.ascan.scan(BASE_URL)
-while (int(zap.ascan.status(scanid)) < 100):
-    # Loop until the scanner has finished
-    print ('Scan progress %: {}'.format(zap.ascan.status(scanid)))
-    time.sleep(5)
+        print ('Active Scan completed')
 
-print ('Active Scan completed')
+        # Report the results
 
-# Report the results
+        print ('Hosts: {}'.format(', '.join(zap.core.hosts)))
+        print ('Alerts: ')
+        pprint(zap.core.alerts())
 
-print ('Hosts: {}'.format(', '.join(zap.core.hosts)))
-print ('Alerts: ')
-pprint(zap.core.alerts())
-
-ALERTS_JSON = json.dumps(zap.core.alerts())
-ALERTS_FILE = open('%ssecurity/results.json' % QA_FOLDER_PATH, 'w')
-ALERTS_FILE.write(str(ALERTS_JSON))
-ALERTS_FILE.close()
+        alerts_json = json.dumps(zap.core.alerts())
+        alerts_file = open('qa/security/results.json', 'w')
+        alerts_file.write(str(alerts_json))
+        alerts_file.close()

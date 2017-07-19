@@ -5,7 +5,7 @@ class Accounts:
     ZAP_API_KEY = '0123456789'
 
     def __init__(self):
-        print "Accounts loaded."
+        print ("Accounts loaded")
 
     ## Admin Email and password for CMS Testing
     admin_url = '/'
