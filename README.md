@@ -37,6 +37,7 @@ Run performance tests using:
 
 Run penetration/security tests using:
 
+    python qa/security/zap_scanner.py
     behave qa/security/features
 
 
