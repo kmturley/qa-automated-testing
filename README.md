@@ -33,7 +33,7 @@ Run end-to-end tests using:
 
 Run performance tests using:
 
-    locust -f qa/performance/locustfile.py --host=https://localhost:3000
+    locust -f qa/performance/locustfile.py --clients 2 --hatch-rate 1 --num-request 4 --no-web --host=http://localhost:3000
 
 Run penetration/security tests using:
 
